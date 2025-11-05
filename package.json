@@ -1,0 +1,23 @@
+{
+  "name": "masterclass-playwright-papito",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/giovanaoliveira78/masterclass-playwright-papito.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/giovanaoliveira78/masterclass-playwright-papito/issues"
+  },
+  "homepage": "https://github.com/giovanaoliveira78/masterclass-playwright-papito#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "@types/node": "^24.9.2"
+  }
+}
