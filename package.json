@@ -18,6 +18,7 @@
   "homepage": "https://github.com/giovanaoliveira78/masterclass-playwright-papito#readme",
   "devDependencies": {
     "@playwright/test": "^1.56.1",
-    "@types/node": "^24.9.2"
+    "@types/node": "^24.10.0",
+    "typescript": "^5.9.3"
   }
 }
