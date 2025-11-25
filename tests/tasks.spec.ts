@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { TaskModel } from './fixtures/task.model'
 
 test('deve poder cadastrar uma nova tarefa', async ({ page }) => {
     await page.goto('http://192.168.15.7:8080/')
@@ -73,23 +74,25 @@ test('deve poder cadastrar uma nova tarefa usando a API do instrutor e usando gh
 
 //Usando uma forma diferente de pegar o elemento que exibe o texto ba lista
 test('deve poder cadastrar uma nova tarefa usando a API do instrutor, captando elemento de forma diferente', async ({ page, request }) => {
-
-    const taskName = 'Estudar Cypress'
-    //await request.delete('Aqui deveria ser o link local da API do instrutor' + taskName) // Na API do instrutor precisa passar a rota e a mensagem, por isso a concatenação com o taskName
+    const task: TaskModel = {
+        name: 'Estudar Cypress',
+        is_done: false
+    }
+    //await request.delete('Aqui deveria ser o link local da API do instrutor' + task.name) // Na API do instrutor precisa passar a rota e a mensagem, por isso a concatenação com o taskName
 
     await page.goto('http://192.168.15.7:8080/')
 
     const inputTaskName = page.locator('input[class*=InputNewTask]')
-    await inputTaskName.fill(taskName)
+    await inputTaskName.fill(task.name)
 
     await page.click('css=button >> text=Create')
 
-    const target = page.locator(`ncss=.task-item p >> text=${taskName}`)
+    const target = page.locator(`ncss=.task-item p >> text=${task.name}`)
     await expect(target).toBeVisible()
 })
 
 test('não deve permitir tarefa duplicada', async ({ page, request }) => {
-    const task = {
+    const task: TaskModel = {
         name: 'Estudar Cypress',
         is_done: false
     }
