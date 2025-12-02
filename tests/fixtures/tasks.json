@@ -1,0 +1,22 @@
+{
+    "success": {
+        "name": "Estudar Cypress",
+        "is_done": false
+    },
+    "duplicate": {
+        "name": "Estudar Cypress",
+        "is_done": false
+    },
+    "requiered": {
+        "name": "",
+        "is_done": false
+    },
+    "update": {
+        "name": "Pagar a fatura do cartão de crédito",
+        "is_done": false
+    },
+    "delete": {
+        "name": "Estudar Ruby",
+        "is_done": false
+    }
+}

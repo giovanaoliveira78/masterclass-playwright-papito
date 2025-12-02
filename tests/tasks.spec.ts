@@ -2,6 +2,84 @@ import { test, expect } from '@playwright/test'
 import { TaskModel } from './fixtures/task.model'
 import { deletTaskByHelper, postTask } from './support/helpers'
 import { TasksPage } from './support/pages/tasks'
+import data from './fixtures/tasks.json'
+
+let tasksPage: TasksPage
+
+test.beforeEach(({ page }) => {
+    tasksPage = new TasksPage(page)
+})
+
+test.describe('cadastro', () => {
+    //Usando uma forma diferente de pegar o elemento que exibe o texto ba lista
+    test('deve poder cadastrar uma nova tarefa usando a API do instrutor, captando elemento de forma diferente', async ({ request }) => {
+        const task = data.success as TaskModel
+        await deletTaskByHelper(request, task.name)
+
+        await tasksPage.go()
+        await tasksPage.create(task)
+        await tasksPage.shouldHaveText(task.name)
+    })
+
+    test('não deve permitir tarefa duplicada', async ({ request }) => {
+        const task = data.duplicate as TaskModel
+
+        await deletTaskByHelper(request, task.name) // Na API do instrutor precisa passar a rota e a mensagem, por isso a concatenação com o taskName
+
+        await postTask(request, task)
+
+        await tasksPage.go()
+        await tasksPage.create(task)
+        await tasksPage.alertHaveText('Task already exists!')
+    })
+
+    test('campo obrigatório', async () => {
+        const task = data.requiered as TaskModel
+
+        await tasksPage.go()
+        await tasksPage.create(task)
+
+        // Nesse contexto a mensagem que é o ponto principal no teste não é HTML
+        // A mensagem vem do navegador, então não da pra inspecionar, é inserido pela propriedade do elemento
+        //Abaixo pega o elemento de imput e converte ele em HMTL
+
+        const validationMessage = await tasksPage.inputTaskName.evaluate(e => (e as HTMLInputElement).validationMessage) // Converte em HTML
+        expect(validationMessage).toEqual('This is a required field')
+    })
+})
+
+test.describe('atualização', () => {
+
+    test('deve concluir uma tarefa', async ({ request }) => {
+        const task = data.update as TaskModel
+
+        await deletTaskByHelper(request, task.name)
+        await postTask(request, task)
+
+        await tasksPage.go()
+        await tasksPage.toggle(task.name)
+        await tasksPage.shouldBeDone(task.name)
+    })
+})
+
+test.describe('exclusão', () => {
+
+    test('deve excluir uma tarefa', async ({ request }) => {
+        const task = data.update as TaskModel
+
+        await deletTaskByHelper(request, task.name)
+        await postTask(request, task)
+
+        await tasksPage.go()
+        await tasksPage.toggle(task.name)
+        await tasksPage.shouldNotExist(task.name)
+    })
+})
+
+
+
+
+///// APRENDENDO 
 
 test('deve poder cadastrar uma nova tarefa', async ({ page }) => {
     await page.goto('http://192.168.15.7:8080/')
@@ -72,52 +150,4 @@ test('deve poder cadastrar uma nova tarefa usando a API do instrutor e usando gh
     // Então essa tarefa deve ser exibida na lista 
     const target = page.getByTestId('task-item')
     await expect(target).toHaveText(taskName)
-})
-
-//Usando uma forma diferente de pegar o elemento que exibe o texto ba lista
-test('deve poder cadastrar uma nova tarefa usando a API do instrutor, captando elemento de forma diferente', async ({ page, request }) => {
-    const task: TaskModel = {
-        name: 'Estudar Cypress',
-        is_done: false
-    }
-    await deletTaskByHelper(request, task.name)
-
-    const tasksPage: TasksPage = new TasksPage(page)
-    await tasksPage.go()
-    await tasksPage.create(task)
-    await tasksPage.shouldHaveText(task.name)
-})
-
-test('não deve permitir tarefa duplicada', async ({ page, request }) => {
-    const task: TaskModel = {
-        name: 'Estudar Cypress',
-        is_done: false
-    }
-
-    await deletTaskByHelper(request, task.name) // Na API do instrutor precisa passar a rota e a mensagem, por isso a concatenação com o taskName
-
-    await postTask(request, task)
-
-    const tasksPage: TasksPage = new TasksPage(page)
-    await tasksPage.go()
-    await tasksPage.create(task)
-    await tasksPage.alertHaveText('Task already exists!')
-})
-
-test('campo obrigatório', async ({ page }) => {
-    const task: TaskModel = {
-        name: '',
-        is_done: false
-    }
-
-    const tasksPage: TasksPage = new TasksPage(page)
-    await tasksPage.go()
-    await tasksPage.create(task)
-
-    // Nesse contexto a mensagem que é o ponto principal no teste não é HTML
-    // A mensagem vem do navegador, então não da pra inspecionar, é inserido pela propriedade do elemento
-    //Abaixo pega o elemento de imput e converte ele em HMTL
-
-    const validationMessage = await tasksPage.inputTaskName.evaluate(e => (e as HTMLInputElement).validationMessage) // Converte em HTML
-    expect(validationMessage).toEqual('This is a required field')
 })
